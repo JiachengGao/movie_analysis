@@ -55,3 +55,84 @@ df=data.loc[:,'woman director':]
 df.to_csv("movies_keywords.csv",index=False)
 
 Director
+
+data['director_name'].fillna('unknown',inplace=True)
+
+def to_frequency_table(data):
+    frequencytable = {}
+    for key in data:
+        if key in frequencytable:
+            frequencytable[key] += 1
+        else:
+            frequencytable[key] = 1
+    return frequencytable
+ 
+director_dic = to_frequency_table(data['director_name'])
+director_list = list(director_dic.items())
+director_list.sort(key=lambda tup: tup[1],reverse=True)
+
+for word in TopTen(director_list):
+    data[word] = data['director_name'].map(lambda s: 1 if word in str(s) else 0)
+
+data.loc[:,'Steven Spielberg': ].head()
+df = data.loc[:,'Steven Spielberg': ]
+df.to_csv("movies_Director.csv",index=False)
+
+Actor
+
+data['actor_1_name'].fillna('unknown',inplace=True)
+data['actor_2_name'].fillna('unknown',inplace=True)
+data['actor_3_name'].fillna('unknown',inplace=True)
+
+data[['actor_1_name','actor_2_name','actor_3_name']].head()
+df=data[['actor_1_name','actor_2_name','actor_3_name']]
+df.to_csv("movies_Actor.csv",index=False)
+
+data['actors_name'] = data[['actor_1_name', 'actor_2_name','actor_3_name']].apply(lambda x: '|'.join(x), axis=1)
+data[['actors_name']].head()
+
+for word in actor:
+    data[word] = data['actors_name'].map(lambda s: 1 if word in str(s) else 0)
+actor = []
+actor = Obtain_list_Occurences("actors_name")
+
+Company
+
+data['companies_1'].fillna('unknown',inplace=True)
+data['companies_2'].fillna('unknown',inplace=True)
+data['companies_3'].fillna('unknown',inplace=True)
+
+data['companies_name'] = data[['companies_1', 'companies_2','companies_3']].apply(lambda x: '|'.join(x), axis=1)
+company = []
+company = Obtain_list_Occurences("companies_name")
+
+for word in company:
+    data[word] = data['companies_name'].map(lambda s: 1 if word in str(s) else 0)
+
+data[['companies_1','companies_2','companies_3']].head()
+df = data[['companies_1','companies_2','companies_3']]
+df.to_csv("movies_Company.csv",index=False)
+
+Countries
+
+data['country'].fillna('unknown',inplace=True)
+
+def to_frequency_table(data):
+    frequencytable = {}
+    for key in data:
+        if key in frequencytable:
+            frequencytable[key] += 1
+        else:
+            frequencytable[key] = 1
+    return frequencytable
+    
+country_dic = to_frequency_table(data['country'])
+country_list = list(director_dic.items())
+country_list.sort(key=lambda tup: tup[1],reverse=True)
+
+for word in TopTen(country_list):
+    data[word] = data['country'].map(lambda s: 1 if word in str(s) else 0)
+
+data[['country']].head()
+df = data[['country']]
+df.to_csv('movie_country.csv')
