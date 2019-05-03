@@ -1,0 +1,57 @@
+Categories
+
+def Obtain_list_Occurences(columnName):
+    # Obtaining a list of columnName
+    list_details = list(map(str,(data[columnName])))
+    listOcc = []
+    for i in data[columnName]:
+        split_genre = list(map(str, i.split('|')))
+        for j in split_genre:
+            if j not in listOcc:
+                listOcc.append(j)
+    return listOcc
+genre = []
+genre = Obtain_list_Occurences("genres")
+for word in genre:
+    data[word] = data['genres'].map(lambda s: 1 if word in str(s) else 0)    
+data.loc[:,'Action': 'Foreign'].head(5)
+df=data.loc[:,'Action': 'Foreign']
+df.to_csv("movies_category.csv",index=False)
+
+Keywords
+
+## Funtion to find top 10 in list
+def TopTen(theList):
+    TopTen = list()
+    for i in range(0, 10):
+        TopTen.append(theList[i][0])   
+    return TopTen
+def count_word(df, ref_col, liste):
+    keyword_count = dict()
+    for s in liste: keyword_count[s] = 0
+    for liste_keywords in df[ref_col].str.split('|'):        
+        if type(liste_keywords) == float and pd.isnull(liste_keywords): continue        
+        for s in [s for s in liste_keywords if s in liste]: 
+            if pd.notnull(s): keyword_count[s] += 1
+            
+    # convert the dictionary in a list to sort the keywords by frequency
+    keyword_occurences = []
+    for k,v in keyword_count.items():
+        keyword_occurences.append([k,v])
+    keyword_occurences.sort(key = lambda x:x[1], reverse = True)
+    return keyword_occurences, keyword_count
+set_keywords = set()
+for liste_keywords in data['plot_keywords'].str.split('|').values:
+    if isinstance(liste_keywords, float): continue  # only happen if liste_keywords = NaN
+    set_keywords = set_keywords.union(liste_keywords)
+# remove null chain entry
+set_keywords.remove('')
+keyword_occurences, dum = count_word(data, 'plot_keywords', set_keywords)
+for word in TopTen(keyword_occurences):
+    data[word] = data['plot_keywords'].map(lambda s: 1 if word in str(s) else 0)   
+data.drop('plot_keywords',axis=1,inplace=True)
+data.loc[:,'woman director':].head()
+df=data.loc[:,'woman director':]
+df.to_csv("movies_keywords.csv",index=False)
+
+Director
