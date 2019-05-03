@@ -1,0 +1,7 @@
+My dataset is from kaggle competition, https://www.kaggle.com/tmdb/tmdb-movie-metadata/kernels
+and I want to do some movie analysis, just like Steam Game analysis I've done before.
+I used Python to extract data which contains json part in excel, and use some machine learning models to 
+predict whether the movie is good or not, based on different aspects, then use cross validation to estimate the accuracy.
+
+Besides, after taken dataset apart to some detailed datasets, I upload them to Mysql to simply analyse the data, and extract some
+importment information.
