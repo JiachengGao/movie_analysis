@@ -1,0 +1,58 @@
+When I checked on internet, I found there are three ways to recommend movies:
+
+1.Demographic Filtering- They offer generalized recommendations to every user, based on movie popularity and/or genre. 
+
+2.Content Based Filtering- They suggest similar items based on a particular item. This system uses item metadata, such as genre,
+director, description, actors, etc. for movies, to make these recommendations. 
+
+3.Collaborative Filtering- This system matches persons with similar interests and provides recommendations based on this matching. 
+
+And what I've used in this project is the 1st one.
+
+We can use the average ratings of the movie as the score but using this won't be fair enough 
+since a movie with 9.0 average rating and only 10 votes cannot be considered better than the movie 
+with 7.8 as as average rating but 400 votes. 
+
+So, I just reference to IMDB's weighted rating (wr) which is given as
+(v/(v+m)*R)+(m/(v+m)*C)
+v is the number of votes for the movie;
+m is the minimum votes required to be listed in the chart;
+R is the average rating of the movie; And
+C is the mean vote across the whole report
+
+code are as follows:
+
+C= data['vote_average'].mean()
+
+m= data['num_voted_users'].quantile(0.8)
+
+movies = data.copy().loc[data['num_voted_users'] >= m]
+
+def weighted_rating(x, m=m, C=C):
+    v = x['num_voted_users']
+    R = x['vote_average']
+    # Calculation based on the IMDB formula
+    return (v/(v+m) * R) + (m/(m+v) * C)
+
+# Define a new feature 'score' and calculate its value with `weighted_rating()`
+movies['score'] = movies.apply(weighted_rating, axis=1)
+
+movies = q_movies.sort_values('score', ascending=False)
+
+# after that, if the vote_average is higher than 70% of the average score I just found, I would say it is a good movie 
+score = movies['score'].quantile(0.7)
+
+data['Good'] = data['vote_average'].map(lambda s :1  if s >= score else 0)
+
+rcParams['figure.figsize'] = 13,10
+data['Good'].value_counts(sort = False)
+
+labels =["not","Good movie"]
+sizes = data['Good'].value_counts(sort = False)
+colors = ["red","green"]
+explode = (0.1,0)
+ 
+plt.pie(sizes, explode=explode, labels=labels, colors=colors,
+        autopct='%1.1f%%', shadow=True, startangle=140,)
+plt.axis('equal')
+plt.show()
