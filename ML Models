@@ -1,1 +1,78 @@
+I used Random Forest, Decision Tree, KNN to train my data
 
+1. use 70% as training data
+
+data['is_train'] = np.random.uniform(0, 1, len(data)) <= .70
+
+train, test = data[data['is_train']==True], data[data['is_train']==False]
+
+train.drop(['is_train'], axis=1, inplace=True)
+test.drop(['is_train'], axis=1, inplace=True)
+
+train["Good"] = train["Good"].astype(int)
+
+Y_train = train["Good"]
+X_train = train.drop(labels = ["Good"],axis = 1)
+Y_test = test["Good"]
+X_test = test.drop(labels = ["Good"],axis = 1)
+
+2. Decision Tree
+
+clf = DecisionTreeClassifier()
+clf.fit(X_train, Y_train)
+
+c_dec = cross_val_score(clf, X_train, Y_train, cv=10)
+c_dec.mean()
+
+result = clf.predict_proba(X_test)[:]
+test_result = np.asarray(Y_test)
+
+Dec_result = pd.DataFrame(result[:,1])
+Dec_result['Predict'] = Dec_result[0].map(lambda s: 1 if s >= 0.6  else 0)
+Dec_result['testAnswer'] = pd.DataFrame(test_result)
+
+Dec_result['Correct'] = np.where((Dec_result['Predict'] == Dec_result['testAnswer'])
+                     , 1, 0)
+Dec_result.head()
+
+### Test score
+Dec_result['Correct'].mean()
+
+3. KNN
+
+knn = KNeighborsClassifier(n_neighbors= 60 )
+knn.fit(X_train, Y_train)
+
+c_knn = cross_val_score(knn, X_train, Y_train, cv=10)
+c_knn.mean()
+
+result = knn.predict_proba(X_test)[:]
+knn_result = pd.DataFrame(result[:,1])
+knn_result['Predict'] = knn_result[0].map(lambda s: 1 if s >= 0.6  else 0)
+knn_result['testAnswer'] = pd.DataFrame(test_result)
+
+knn_result['Correct'] = np.where((knn_result['Predict'] == knn_result['testAnswer'])
+                     , 1, 0)
+knn_result.head()
+
+### Test Score
+knn_result['Correct'].mean()
+
+4. Random Forest
+
+Rfclf = RandomForestClassifier()
+Rfclf.fit(X_train, Y_train)
+
+c_rf =  cross_val_score(Rfclf, X_train, Y_train, cv=10)
+c_rf.mean()
+
+result = Rfclf.predict_proba(X_test)[:]
+Rf_result = pd.DataFrame(result[:,1])
+Rf_result['Predict'] = Rf_result[0].map(lambda s: 1 if s >= 0.6  else 0)
+Rf_result['testAnswer'] = pd.DataFrame(test_result)
+
+Rf_result['Correct'] = np.where((Rf_result['Predict'] == Rf_result['testAnswer'])
+                     , 1, 0)
+Rf_result.head()
+
+Rf_result['Correct'].mean()
