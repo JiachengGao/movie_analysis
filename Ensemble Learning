@@ -1,0 +1,20 @@
+### I used Voting ways to emsemble all the models I've used before
+
+from sklearn.metrics import classification_report
+
+voting = pd.DataFrame()
+
+voting["knn"] =knn_result['Predict']
+voting["GB"] = gb_result['Predict']
+voting["RF"] = Rf_result['Predict']
+voting['sum'] = voting.sum(axis=1)
+
+voting['Predict'] = voting['sum'].map(lambda s: 1 if s >= 2 else 0)
+
+voting['testAnswer'] = pd.DataFrame(test_result)
+
+voting['Correct'] = np.where((voting['Predict'] == voting['testAnswer']) , 1, 0)
+
+voting['Correct'].mean()
+
+print(classification_report(voting['testAnswer'], voting['Predict']))
